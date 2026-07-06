@@ -1,0 +1,54 @@
+{
+  "pizzas": {
+    "pizza1": {
+      "nombre": "Margarita Clásica",
+      "descripcion": "Pizza clásica preparada con salsa de tomate natural, mozzarella fresca y hojas de albahaca. Un sabor auténtico italiano.",
+      "precio": "28.00",
+      "stock": "12",
+      "tamano": "Mediana - 30cm",
+      "ingredientes": "Tomate, mozzarella, albahaca",
+      "imagenUrl": "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=400",
+      "categoria": "Clásicas"
+    },
+    "pizza2": {
+      "nombre": "Pepperoni Supreme",
+      "descripcion": "Pizza con generosas rodajas de pepperoni, queso mozzarella derretido y salsa especial de la casa.",
+      "precio": "38.00",
+      "stock": "8",
+      "tamano": "Grande - 35cm",
+      "ingredientes": "Pepperoni, queso mozzarella, salsa especial",
+      "imagenUrl": "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=400",
+      "categoria": "Especiales"
+    },
+    "pizza3": {
+      "nombre": "Vegetariana Verde",
+      "descripcion": "Pizza vegetariana cargada de espinaca fresca, champiñones salteados y aceitunas negras. Ideal para amantes de lo natural.",
+      "precio": "45.00",
+      "stock": "6",
+      "tamano": "Familiar - 40cm",
+      "ingredientes": "Espinaca, champiñones, aceitunas, pimiento verde",
+      "imagenUrl": "https://images.unsplash.com/photo-1511689660979-10d2b1aada49?w=400",
+      "categoria": "Familiares"
+    },
+    "pizza4": {
+      "nombre": "Hawaiana Little Caesars",
+      "descripcion": "Nuestra versión especial de la hawaiana con jamón ahumado, piña caramelizada y queso mozzarella.",
+      "precio": "35.00",
+      "stock": "10",
+      "tamano": "Mediana - 30cm",
+      "ingredientes": "Jamón ahumado, piña, mozzarella",
+      "imagenUrl": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400",
+      "categoria": "Promociones"
+    },
+    "pizza5": {
+      "nombre": "Cuatro Quesos Especial",
+      "descripcion": "Deliciosa combinación de mozzarella, parmesano, gorgonzola y queso de cabra sobre base de salsa blanca.",
+      "precio": "42.00",
+      "stock": "5",
+      "tamano": "Grande - 35cm",
+      "ingredientes": "Mozzarella, parmesano, gorgonzola, queso de cabra",
+      "imagenUrl": "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400",
+      "categoria": "Especiales"
+    }
+  }
+}
