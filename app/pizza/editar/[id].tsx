@@ -1,4 +1,3 @@
-// Pantalla Editar Pizza - Actualizar o eliminar una pizza existente
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -16,8 +15,6 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ref, onValue, update, remove } from "firebase/database";
 import { database } from "../../../config/firebaseConfig";
-
-// Colores principales de la app
 const COLORS = {
   primary: "#C9362C",
   primaryDark: "#A72B23",
@@ -27,16 +24,11 @@ const COLORS = {
   gray: "#777777",
   border: "#E5D8CE",
 };
-
-// Opciones de categoría disponibles
 const CATEGORIAS = ["Clásicas", "Especiales", "Familiares", "Promociones"];
 
 export default function EditarPizzaScreen() {
-  // Obtener el id de la pizza desde los parámetros
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-
-  // Estados del formulario
   const [nombre, setNombre] = useState("");
   const [precio, setPrecio] = useState("");
   const [stock, setStock] = useState("");
@@ -46,19 +38,12 @@ export default function EditarPizzaScreen() {
   const [imagenUrl, setImagenUrl] = useState("");
   const [categoria, setCategoria] = useState("");
   const [cargando, setCargando] = useState(true);
-
-  // useEffect: Cargar datos actuales de la pizza desde Firebase
   useEffect(() => {
     if (!id) return;
-
-    // Referencia a la pizza en Firebase
     const pizzaRef = ref(database, `pizzas/${id}`);
-
-    // Leer datos una vez con onValue
     const unsubscribe = onValue(pizzaRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        // Llenar los campos con los datos actuales
         setNombre(data.nombre || "");
         setPrecio(data.precio || "");
         setStock(data.stock || "");
@@ -73,10 +58,7 @@ export default function EditarPizzaScreen() {
 
     return () => unsubscribe();
   }, [id]);
-
-  // Función para actualizar la pizza en Firebase
   const actualizarPizza = () => {
-    // Validación: campos obligatorios no vacíos
     if (
       !nombre.trim() ||
       !precio.trim() ||
@@ -92,20 +74,14 @@ export default function EditarPizzaScreen() {
       );
       return;
     }
-
-    // Validación: precio numérico
     if (isNaN(Number(precio)) || Number(precio) <= 0) {
       Alert.alert("Precio inválido", "El precio debe ser un número válido mayor a 0.");
       return;
     }
-
-    // Validación: stock numérico
     if (isNaN(Number(stock)) || Number(stock) < 0) {
       Alert.alert("Stock inválido", "El stock debe ser un número válido.");
       return;
     }
-
-    // Actualizar en Firebase usando update()
     update(ref(database, `pizzas/${id}`), {
       nombre: nombre.trim(),
       precio: precio.trim(),
@@ -128,10 +104,7 @@ export default function EditarPizzaScreen() {
         Alert.alert("Error", "No se pudo actualizar: " + error.message);
       });
   };
-
-  // Función para eliminar la pizza
   const eliminarPizza = () => {
-    // Confirmación antes de eliminar
     Alert.alert(
       "Eliminar pizza",
       "¿Seguro que deseas eliminar esta pizza? Esta acción no se puede deshacer.",
@@ -141,7 +114,6 @@ export default function EditarPizzaScreen() {
           text: "Eliminar",
           style: "destructive",
           onPress: () => {
-            // Eliminar de Firebase usando remove()
             remove(ref(database, `pizzas/${id}`))
               .then(() => {
                 Alert.alert("Eliminada", "Pizza eliminada correctamente.", [
@@ -159,8 +131,6 @@ export default function EditarPizzaScreen() {
       ]
     );
   };
-
-  // Pantalla de carga
   if (cargando) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
@@ -172,7 +142,6 @@ export default function EditarPizzaScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      {/* Barra superior roja */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
           <Text style={styles.headerBack}>← Volver</Text>
@@ -190,9 +159,7 @@ export default function EditarPizzaScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Tarjeta del formulario */}
           <View style={styles.formCard}>
-            {/* Campo: Nombre */}
             <Text style={styles.label}>Nombre de la pizza *</Text>
             <TextInput
               style={styles.input}
@@ -201,8 +168,6 @@ export default function EditarPizzaScreen() {
               value={nombre}
               onChangeText={setNombre}
             />
-
-            {/* Fila: Precio y Stock */}
             <View style={styles.row}>
               <View style={styles.halfField}>
                 <Text style={styles.label}>Precio (S/) *</Text>
@@ -227,8 +192,6 @@ export default function EditarPizzaScreen() {
                 />
               </View>
             </View>
-
-            {/* Campo: Categoría */}
             <Text style={styles.label}>Categoría *</Text>
             <View style={styles.categoriasRow}>
               {CATEGORIAS.map((cat) => (
@@ -251,8 +214,6 @@ export default function EditarPizzaScreen() {
                 </TouchableOpacity>
               ))}
             </View>
-
-            {/* Campo: Tamaño */}
             <Text style={styles.label}>Tamaño *</Text>
             <TextInput
               style={styles.input}
@@ -261,8 +222,6 @@ export default function EditarPizzaScreen() {
               value={tamano}
               onChangeText={setTamano}
             />
-
-            {/* Campo: Ingredientes */}
             <Text style={styles.label}>Ingredientes *</Text>
             <TextInput
               style={[styles.input, styles.textArea]}
@@ -273,8 +232,6 @@ export default function EditarPizzaScreen() {
               multiline
               numberOfLines={2}
             />
-
-            {/* Campo: Descripción */}
             <Text style={styles.label}>Descripción *</Text>
             <TextInput
               style={[styles.input, styles.textArea]}
@@ -285,8 +242,6 @@ export default function EditarPizzaScreen() {
               multiline
               numberOfLines={3}
             />
-
-            {/* Campo: URL de imagen */}
             <Text style={styles.label}>URL de imagen (opcional)</Text>
             <TextInput
               style={styles.input}
@@ -297,16 +252,12 @@ export default function EditarPizzaScreen() {
               autoCapitalize="none"
               keyboardType="url"
             />
-
-            {/* Botón: Actualizar */}
             <TouchableOpacity
               style={styles.updateButton}
               onPress={actualizarPizza}
             >
               <Text style={styles.updateButtonText}>✅ Actualizar pizza</Text>
             </TouchableOpacity>
-
-            {/* Botón: Eliminar */}
             <TouchableOpacity
               style={styles.deleteButton}
               onPress={eliminarPizza}
@@ -367,7 +318,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderRadius: 20,
     padding: 20,
-    // Sombra
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
@@ -408,7 +358,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     alignItems: "center",
     marginTop: 24,
-    // Sombra
     shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,

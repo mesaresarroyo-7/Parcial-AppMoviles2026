@@ -1,4 +1,3 @@
-// Pantalla Registrar Pizza - Formulario para agregar nuevas pizzas a Firebase
 import React, { useState } from "react";
 import {
   View,
@@ -14,8 +13,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ref, push } from "firebase/database";
 import { database } from "../../config/firebaseConfig";
-
-// Colores principales de la app
 const COLORS = {
   primary: "#C9362C",
   primaryDark: "#A72B23",
@@ -25,12 +22,9 @@ const COLORS = {
   gray: "#777777",
   border: "#E5D8CE",
 };
-
-// Opciones de categoría disponibles
 const CATEGORIAS = ["Clásicas", "Especiales", "Familiares", "Promociones"];
 
 export default function RegistrarScreen() {
-  // Estados del formulario
   const [nombre, setNombre] = useState("");
   const [precio, setPrecio] = useState("");
   const [stock, setStock] = useState("");
@@ -39,8 +33,6 @@ export default function RegistrarScreen() {
   const [descripcion, setDescripcion] = useState("");
   const [imagenUrl, setImagenUrl] = useState("");
   const [categoria, setCategoria] = useState("");
-
-  // Función para limpiar todos los campos del formulario
   const limpiarCampos = () => {
     setNombre("");
     setPrecio("");
@@ -51,10 +43,7 @@ export default function RegistrarScreen() {
     setImagenUrl("");
     setCategoria("");
   };
-
-  // Función para guardar la pizza en Firebase
   const guardarPizza = () => {
-    // Validación: campos obligatorios no vacíos
     if (
       !nombre.trim() ||
       !precio.trim() ||
@@ -70,20 +59,14 @@ export default function RegistrarScreen() {
       );
       return;
     }
-
-    // Validación: precio debe ser numérico
     if (isNaN(Number(precio)) || Number(precio) <= 0) {
       Alert.alert("Precio inválido", "El precio debe ser un número válido mayor a 0.");
       return;
     }
-
-    // Validación: stock debe ser numérico
     if (isNaN(Number(stock)) || Number(stock) < 0) {
       Alert.alert("Stock inválido", "El stock debe ser un número válido.");
       return;
     }
-
-    // Registrar la pizza en Firebase Realtime Database
     push(ref(database, "pizzas"), {
       nombre: nombre.trim(),
       precio: precio.trim(),
@@ -95,19 +78,16 @@ export default function RegistrarScreen() {
       categoria: categoria,
     })
       .then(() => {
-        // Éxito: mostrar alerta y limpiar campos
         Alert.alert("¡Éxito!", "Pizza registrada correctamente.");
         limpiarCampos();
       })
       .catch((error) => {
-        // Error: mostrar alerta con mensaje
         Alert.alert("Error", "No se pudo registrar la pizza: " + error.message);
       });
   };
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      {/* Barra superior roja */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Registrar Pizza 🍕</Text>
         <Text style={styles.headerSubtitle}>
@@ -124,9 +104,7 @@ export default function RegistrarScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {/* Tarjeta del formulario */}
           <View style={styles.formCard}>
-            {/* Campo: Nombre */}
             <Text style={styles.label}>Nombre de la pizza *</Text>
             <TextInput
               style={styles.input}
@@ -135,8 +113,6 @@ export default function RegistrarScreen() {
               value={nombre}
               onChangeText={setNombre}
             />
-
-            {/* Fila: Precio y Stock */}
             <View style={styles.row}>
               <View style={styles.halfField}>
                 <Text style={styles.label}>Precio (S/) *</Text>
@@ -161,8 +137,6 @@ export default function RegistrarScreen() {
                 />
               </View>
             </View>
-
-            {/* Campo: Categoría */}
             <Text style={styles.label}>Categoría *</Text>
             <View style={styles.categoriasRow}>
               {CATEGORIAS.map((cat) => (
@@ -185,8 +159,6 @@ export default function RegistrarScreen() {
                 </TouchableOpacity>
               ))}
             </View>
-
-            {/* Campo: Tamaño */}
             <Text style={styles.label}>Tamaño *</Text>
             <TextInput
               style={styles.input}
@@ -195,8 +167,6 @@ export default function RegistrarScreen() {
               value={tamano}
               onChangeText={setTamano}
             />
-
-            {/* Campo: Ingredientes */}
             <Text style={styles.label}>Ingredientes *</Text>
             <TextInput
               style={[styles.input, styles.textArea]}
@@ -207,8 +177,6 @@ export default function RegistrarScreen() {
               multiline
               numberOfLines={2}
             />
-
-            {/* Campo: Descripción */}
             <Text style={styles.label}>Descripción *</Text>
             <TextInput
               style={[styles.input, styles.textArea]}
@@ -219,8 +187,6 @@ export default function RegistrarScreen() {
               multiline
               numberOfLines={3}
             />
-
-            {/* Campo: URL de imagen */}
             <Text style={styles.label}>URL de imagen (opcional)</Text>
             <TextInput
               style={styles.input}
@@ -231,8 +197,6 @@ export default function RegistrarScreen() {
               autoCapitalize="none"
               keyboardType="url"
             />
-
-            {/* Botón: Guardar pizza */}
             <TouchableOpacity style={styles.saveButton} onPress={guardarPizza}>
               <Text style={styles.saveButtonText}>🍕 Guardar pizza</Text>
             </TouchableOpacity>
@@ -276,12 +240,10 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderRadius: 20,
     padding: 20,
-    // Sombra iOS
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 10,
-    // Sombra Android
     elevation: 4,
   },
   label: {
@@ -318,7 +280,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     alignItems: "center",
     marginTop: 24,
-    // Sombra del botón
     shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,

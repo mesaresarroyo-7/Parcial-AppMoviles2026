@@ -1,4 +1,3 @@
-// Pantalla de Registro - Crear cuenta con Firebase Authentication
 import React, { useState } from "react";
 import {
   View,
@@ -14,10 +13,8 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signOut } from "firebase/auth";
 import { auth } from "../../config/firebaseConfig";
-
-// Colores principales de la app (consistentes con login)
 const COLORS = {
   primary: "#C9362C",
   primaryDark: "#A72B23",
@@ -30,16 +27,12 @@ const COLORS = {
 };
 
 export default function RegisterScreen() {
-  // Estado para los campos del formulario
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-
-  // Función para manejar el registro con Firebase
   const handleRegister = async () => {
-    // Validación de campos vacíos
     if (!email.trim() || !password.trim() || !confirmPassword.trim()) {
       Alert.alert(
         "Campos vacíos",
@@ -47,8 +40,6 @@ export default function RegisterScreen() {
       );
       return;
     }
-
-    // Validación de contraseñas coincidentes
     if (password !== confirmPassword) {
       Alert.alert(
         "Contraseñas no coinciden",
@@ -56,8 +47,6 @@ export default function RegisterScreen() {
       );
       return;
     }
-
-    // Validación de longitud mínima de contraseña (Firebase requiere al menos 6 caracteres)
     if (password.length < 6) {
       Alert.alert(
         "Contraseña muy corta",
@@ -69,22 +58,19 @@ export default function RegisterScreen() {
     setLoading(true);
 
     try {
-      // Crear usuario con Firebase Authentication - UNA SOLA LÍNEA
       await createUserWithEmailAndPassword(auth, email.trim(), password);
-
-      // Registro exitoso
+      await signOut(auth);
       Alert.alert(
         "¡Registro exitoso! ✅",
-        "Tu cuenta ha sido creada correctamente. Ahora puedes iniciar sesión.",
+        "Tu cuenta ha sido creada correctamente. ¡Bienvenido!",
         [
           {
-            text: "Ir al Login",
-            onPress: () => router.replace("/(auth)/login"),
+            text: "Ir al inicio",
+            onPress: () => router.replace("/(tabs)/home"),
           },
         ]
       );
     } catch (error: any) {
-      // Manejo de errores de Firebase con mensajes en español
       let errorMessage = "Ocurrió un error inesperado. Intenta de nuevo.";
 
       switch (error.code) {
@@ -129,7 +115,6 @@ export default function RegisterScreen() {
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Logo y título */}
           <View style={styles.logoContainer}>
             <Text style={styles.logoEmoji}>🍕</Text>
             <Text style={styles.title}>Crear Cuenta</Text>
@@ -137,10 +122,7 @@ export default function RegisterScreen() {
               Regístrate para acceder a Little Caesars
             </Text>
           </View>
-
-          {/* Formulario de registro */}
           <View style={styles.formCard}>
-            {/* Campo: Correo electrónico */}
             <Text style={styles.label}>Correo electrónico</Text>
             <TextInput
               style={styles.input}
@@ -152,8 +134,6 @@ export default function RegisterScreen() {
               autoCapitalize="none"
               autoCorrect={false}
             />
-
-            {/* Campo: Contraseña */}
             <Text style={styles.label}>Contraseña</Text>
             <TextInput
               style={styles.input}
@@ -163,8 +143,6 @@ export default function RegisterScreen() {
               onChangeText={setPassword}
               secureTextEntry
             />
-
-            {/* Campo: Confirmar contraseña */}
             <Text style={styles.label}>Confirmar contraseña</Text>
             <TextInput
               style={styles.input}
@@ -174,8 +152,6 @@ export default function RegisterScreen() {
               onChangeText={setConfirmPassword}
               secureTextEntry
             />
-
-            {/* Botón de registro */}
             <TouchableOpacity
               style={[styles.registerButton, loading && styles.buttonDisabled]}
               onPress={handleRegister}
@@ -188,8 +164,6 @@ export default function RegisterScreen() {
               )}
             </TouchableOpacity>
           </View>
-
-          {/* Link para ir al login */}
           <TouchableOpacity
             style={styles.loginLinkContainer}
             onPress={() => router.replace("/(auth)/login")}
@@ -199,8 +173,12 @@ export default function RegisterScreen() {
               <Text style={styles.loginLinkBold}>Inicia sesión</Text>
             </Text>
           </TouchableOpacity>
-
-          {/* Pie de pantalla */}
+          <TouchableOpacity
+            style={styles.skipButton}
+            onPress={() => router.replace("/(tabs)/home")}
+          >
+            <Text style={styles.skipText}>Omitir por ahora →</Text>
+          </TouchableOpacity>
           <Text style={styles.footerText}>
             © 2026 Little Caesars{"\n"}
             Desarrollo de Aplicaciones Móviles 2
@@ -249,12 +227,10 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderRadius: 20,
     padding: 24,
-    // Sombra iOS
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 12,
-    // Sombra Android
     elevation: 6,
     marginBottom: 24,
   },
@@ -281,7 +257,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     alignItems: "center",
     marginTop: 24,
-    // Sombra del botón
     shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -313,5 +288,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.gray,
     lineHeight: 18,
+  },
+  skipButton: {
+    alignItems: "center",
+    marginBottom: 20,
+    paddingVertical: 12,
+  },
+  skipText: {
+    fontSize: 14,
+    color: COLORS.gray,
+    fontWeight: "500",
   },
 });

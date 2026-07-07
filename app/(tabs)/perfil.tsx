@@ -1,5 +1,4 @@
-// Pantalla Perfil - Información del administrador y opciones de gestión
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,12 +6,13 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-
-// Colores principales de la app
+import { onAuthStateChanged, signOut, User } from "firebase/auth";
+import { auth } from "../../config/firebaseConfig";
 const COLORS = {
   primary: "#C9362C",
   primaryDark: "#A72B23",
@@ -25,8 +25,15 @@ const COLORS = {
 
 export default function PerfilScreen() {
   const router = useRouter();
-
-  // Función para cerrar sesión
+  const [usuario, setUsuario] = useState<User | null>(null);
+  const [verificando, setVerificando] = useState(true);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUsuario(user);
+      setVerificando(false);
+    });
+    return () => unsubscribe();
+  }, []);
   const cerrarSesion = () => {
     Alert.alert(
       "Cerrar sesión",
@@ -36,18 +43,68 @@ export default function PerfilScreen() {
         {
           text: "Cerrar sesión",
           style: "destructive",
-          onPress: () => {
-            // Redirigir al login
-            router.replace("/(auth)/login");
+          onPress: async () => {
+            try {
+              await signOut(auth);
+              router.replace("/(tabs)/home");
+            } catch (error) {
+              Alert.alert("Error", "No se pudo cerrar la sesión.");
+            }
           },
         },
       ]
     );
   };
-
+  if (verificando) {
+    return (
+      <SafeAreaView style={styles.container} edges={["top"]}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Perfil</Text>
+        </View>
+        <View style={styles.centerContent}>
+          <ActivityIndicator size="large" color={COLORS.primary} />
+          <Text style={styles.loadingText}>Verificando sesión...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+  if (!usuario) {
+    return (
+      <SafeAreaView style={styles.container} edges={["top"]}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Perfil</Text>
+        </View>
+        <View style={styles.centerContent}>
+          <View style={styles.lockIconContainer}>
+            <Ionicons name="lock-closed" size={48} color={COLORS.primary} />
+          </View>
+          <Text style={styles.noAuthTitle}>Acceso restringido</Text>
+          <Text style={styles.noAuthSubtitle}>
+            Debes iniciar sesión para ver tu perfil y acceder a las opciones de
+            gestión.
+          </Text>
+          <TouchableOpacity
+            style={styles.loginButton}
+            onPress={() => router.replace("/(auth)/login")}
+          >
+            <Ionicons name="log-in-outline" size={20} color={COLORS.white} />
+            <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.registerLink}
+            onPress={() => router.push("/(auth)/register")}
+          >
+            <Text style={styles.registerLinkText}>
+              ¿No tienes cuenta?{" "}
+              <Text style={styles.registerLinkBold}>Regístrate</Text>
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      {/* Encabezado rojo */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Perfil</Text>
       </View>
@@ -56,22 +113,76 @@ export default function PerfilScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Tarjeta de perfil */}
         <View style={styles.profileCard}>
           <View style={styles.avatarContainer}>
             <Text style={styles.avatarEmoji}>🍕</Text>
           </View>
-          <Text style={styles.profileName}>Administrador</Text>
-          <Text style={styles.profileEmail}>admin@littlecaesars.com</Text>
+          <Text style={styles.profileName}>
+            {usuario.displayName || "Usuario"}
+          </Text>
+          <Text style={styles.profileEmail}>{usuario.email}</Text>
+          <View style={styles.uidContainer}>
+            <Text style={styles.uidLabel}>ID de usuario:</Text>
+            <Text style={styles.uidValue} numberOfLines={1}>
+              {usuario.uid}
+            </Text>
+          </View>
           <View style={styles.roleBadge}>
-            <Text style={styles.roleText}>Admin</Text>
+            <Text style={styles.roleText}>Autenticado ✅</Text>
           </View>
         </View>
-
-        {/* Sección: Gestión de catálogo */}
+        <Text style={styles.sectionTitle}>Información de la cuenta</Text>
+        <View style={styles.menuCard}>
+          <View style={styles.aboutItem}>
+            <Text style={styles.aboutLabel}>Correo electrónico</Text>
+            <Text style={styles.aboutValue} numberOfLines={1}>
+              {usuario.email || "No disponible"}
+            </Text>
+          </View>
+          <View style={styles.menuDivider} />
+          <View style={styles.aboutItem}>
+            <Text style={styles.aboutLabel}>ID único (UID)</Text>
+            <Text style={styles.aboutValue} numberOfLines={1}>
+              {usuario.uid}
+            </Text>
+          </View>
+          <View style={styles.menuDivider} />
+          <View style={styles.aboutItem}>
+            <Text style={styles.aboutLabel}>Última conexión</Text>
+            <Text style={styles.aboutValue}>
+              {usuario.metadata.lastSignInTime
+                ? new Date(usuario.metadata.lastSignInTime).toLocaleDateString(
+                    "es-PE",
+                    {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }
+                  )
+                : "No disponible"}
+            </Text>
+          </View>
+          <View style={styles.menuDivider} />
+          <View style={styles.aboutItem}>
+            <Text style={styles.aboutLabel}>Cuenta creada</Text>
+            <Text style={styles.aboutValue}>
+              {usuario.metadata.creationTime
+                ? new Date(usuario.metadata.creationTime).toLocaleDateString(
+                    "es-PE",
+                    {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    }
+                  )
+                : "No disponible"}
+            </Text>
+          </View>
+        </View>
         <Text style={styles.sectionTitle}>Gestión de catálogo</Text>
         <View style={styles.menuCard}>
-          {/* Opción: Ver pizzas registradas */}
           <TouchableOpacity
             style={styles.menuItem}
             onPress={() => router.push("/(tabs)/home")}
@@ -86,8 +197,6 @@ export default function PerfilScreen() {
           </TouchableOpacity>
 
           <View style={styles.menuDivider} />
-
-          {/* Opción: Registrar nueva pizza */}
           <TouchableOpacity
             style={styles.menuItem}
             onPress={() => router.push("/(tabs)/registrar")}
@@ -100,22 +209,7 @@ export default function PerfilScreen() {
             </View>
             <Ionicons name="chevron-forward" size={20} color={COLORS.gray} />
           </TouchableOpacity>
-
-          <View style={styles.menuDivider} />
-
-          {/* Opción: Configuración */}
-          <TouchableOpacity style={styles.menuItem}>
-            <View style={styles.menuItemLeft}>
-              <View style={[styles.menuIcon, { backgroundColor: "#FFF3E0" }]}>
-                <Ionicons name="settings" size={20} color="#FF9800" />
-              </View>
-              <Text style={styles.menuText}>Configuración</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color={COLORS.gray} />
-          </TouchableOpacity>
         </View>
-
-        {/* Sección: Acerca de */}
         <Text style={styles.sectionTitle}>Acerca de</Text>
         <View style={styles.menuCard}>
           <View style={styles.aboutItem}>
@@ -133,16 +227,12 @@ export default function PerfilScreen() {
             <Text style={styles.aboutValue}>Desarrollo de Apps Móviles 2</Text>
           </View>
         </View>
-
-        {/* Botón: Cerrar sesión */}
         <TouchableOpacity style={styles.logoutButton} onPress={cerrarSesion}>
           <Ionicons name="log-out-outline" size={20} color={COLORS.white} />
           <Text style={styles.logoutText}>Cerrar sesión</Text>
         </TouchableOpacity>
 
-        <Text style={styles.footerText}>
-          © 2026 Little Caesars
-        </Text>
+        <Text style={styles.footerText}>© 2026 Little Caesars</Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -166,6 +256,73 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: COLORS.white,
   },
+  centerContent: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 32,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 15,
+    color: COLORS.gray,
+  },
+  lockIconContainer: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: "#FFEBEE",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  noAuthTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    color: COLORS.text,
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  noAuthSubtitle: {
+    fontSize: 15,
+    color: COLORS.gray,
+    textAlign: "center",
+    lineHeight: 22,
+    marginBottom: 28,
+  },
+  loginButton: {
+    backgroundColor: COLORS.primary,
+    borderRadius: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 16,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+    width: "100%",
+  },
+  loginButtonText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  registerLink: {
+    marginTop: 4,
+  },
+  registerLinkText: {
+    fontSize: 14,
+    color: COLORS.gray,
+  },
+  registerLinkBold: {
+    color: COLORS.primary,
+    fontWeight: "bold",
+  },
   scrollContent: {
     padding: 16,
     paddingBottom: 32,
@@ -176,7 +333,6 @@ const styles = StyleSheet.create({
     padding: 24,
     alignItems: "center",
     marginBottom: 24,
-    // Sombra
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
@@ -208,8 +364,27 @@ const styles = StyleSheet.create({
     color: COLORS.gray,
     marginBottom: 12,
   },
+  uidContainer: {
+    backgroundColor: COLORS.cream,
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    marginBottom: 12,
+    width: "100%",
+    alignItems: "center",
+  },
+  uidLabel: {
+    fontSize: 11,
+    color: COLORS.gray,
+    marginBottom: 2,
+  },
+  uidValue: {
+    fontSize: 12,
+    color: COLORS.text,
+    fontWeight: "500",
+  },
   roleBadge: {
-    backgroundColor: "#FFEBEE",
+    backgroundColor: "#E8F5E9",
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 12,
@@ -217,7 +392,7 @@ const styles = StyleSheet.create({
   roleText: {
     fontSize: 12,
     fontWeight: "bold",
-    color: COLORS.primary,
+    color: "#2E7D32",
   },
   sectionTitle: {
     fontSize: 16,
@@ -231,7 +406,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 4,
     marginBottom: 24,
-    // Sombra
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
@@ -276,11 +450,14 @@ const styles = StyleSheet.create({
   aboutLabel: {
     fontSize: 14,
     color: COLORS.gray,
+    flex: 1,
   },
   aboutValue: {
     fontSize: 14,
     color: COLORS.text,
     fontWeight: "500",
+    flex: 1,
+    textAlign: "right",
   },
   logoutButton: {
     backgroundColor: COLORS.primary,
@@ -291,7 +468,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
     marginBottom: 16,
-    // Sombra del botón
     shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,

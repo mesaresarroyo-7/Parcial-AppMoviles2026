@@ -1,4 +1,3 @@
-// Pantalla Detalle de Pizza - Muestra toda la info de una pizza desde Firebase
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -14,8 +13,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { ref, onValue } from "firebase/database";
 import { database } from "../../config/firebaseConfig";
 import { Pizza } from "../../types/pizza";
-
-// Colores principales de la app
 const COLORS = {
   primary: "#C9362C",
   primaryDark: "#A72B23",
@@ -28,22 +25,13 @@ const COLORS = {
 };
 
 export default function PizzaDetailScreen() {
-  // Obtener el id de la pizza desde los parámetros de la URL
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-
-  // Estados de la pantalla
   const [pizza, setPizza] = useState<Pizza | null>(null);
   const [cargando, setCargando] = useState(true);
-
-  // useEffect: Cargar datos de la pizza desde Firebase
   useEffect(() => {
     if (!id) return;
-
-    // Referencia a la pizza específica en Firebase
     const pizzaRef = ref(database, `pizzas/${id}`);
-
-    // Escuchar cambios en tiempo real
     const unsubscribe = onValue(pizzaRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
@@ -53,12 +41,8 @@ export default function PizzaDetailScreen() {
       }
       setCargando(false);
     });
-
-    // Limpiar suscripción
     return () => unsubscribe();
   }, [id]);
-
-  // Pantalla de carga
   if (cargando) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
@@ -67,8 +51,6 @@ export default function PizzaDetailScreen() {
       </SafeAreaView>
     );
   }
-
-  // Pizza no encontrada
   if (!pizza) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
@@ -87,9 +69,7 @@ export default function PizzaDetailScreen() {
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Parte superior roja con imagen */}
         <View style={styles.imageSection}>
-          {/* Botón volver */}
           <TouchableOpacity
             style={styles.backArrow}
             onPress={() => router.back()}
@@ -109,14 +89,9 @@ export default function PizzaDetailScreen() {
             </View>
           )}
         </View>
-
-        {/* Tarjeta de información */}
         <View style={styles.infoCard}>
-          {/* Nombre y precio */}
           <Text style={styles.nombre}>{pizza.nombre}</Text>
           <Text style={styles.precio}>S/ {pizza.precio}</Text>
-
-          {/* Badges de info rápida */}
           <View style={styles.badgesRow}>
             {pizza.categoria ? (
               <View style={[styles.badge, { backgroundColor: "#FFEBEE" }]}>
@@ -135,30 +110,21 @@ export default function PizzaDetailScreen() {
               <Text style={styles.stockBadgeText}>Stock: {pizza.stock}</Text>
             </View>
           </View>
-
-          {/* Ingredientes */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>🧀 Ingredientes</Text>
             <Text style={styles.sectionContent}>{pizza.ingredientes}</Text>
           </View>
-
-          {/* Descripción */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>📝 Descripción</Text>
             <Text style={styles.sectionContent}>{pizza.descripcion}</Text>
           </View>
-
-          {/* Botones de acción */}
           <View style={styles.actionsContainer}>
-            {/* Botón: Editar */}
             <TouchableOpacity
               style={styles.editButton}
               onPress={() => router.push(`/pizza/editar/${id}`)}
             >
               <Text style={styles.editButtonText}>✏️ Editar pizza</Text>
             </TouchableOpacity>
-
-            {/* Botón: Volver */}
             <TouchableOpacity
               style={styles.secondaryButton}
               onPress={() => router.back()}
@@ -298,7 +264,6 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: "center",
-    // Sombra
     shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,

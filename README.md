@@ -1,35 +1,31 @@
-# Parcial App Móviles - Little Caesars
+# Parcial App Moviles 2026
 
-Aplicación móvil desarrollada con Expo, React Native y Firebase.
+Aplicacion movil hecha con Expo/React Native para el parcial de Aplicaciones Moviles.
 
 ## Requisitos
 
 - Node.js instalado
 - Expo Go en el celular o emulador Android
 
-## Cómo ejecutar
+## Instalacion
 
 ```bash
 npm install
+```
+
+## Ejecutar
+
+```bash
 npm start
 ```
 
-Para abrir directamente en Android:
+Opciones utiles:
 
 ```bash
 npm run android
-```
-
-Para web:
-
-```bash
 npm run web
 ```
 
-## Estructura principal
+## Nota
 
-- `app/`: pantallas y rutas de la aplicación.
-- `components/`: componentes reutilizables.
-- `config/firebaseConfig.ts`: configuración de Firebase.
-- `assets/`: íconos e imágenes de la app.
-- `firebase-data.json`: datos base de pizzas para cargar en Firebase si se requiere.
+El repositorio incluye el codigo fuente, configuracion, assets y lockfile necesarios para instalar y correr el proyecto. La carpeta `node_modules` no se sube porque se regenera con `npm install`.

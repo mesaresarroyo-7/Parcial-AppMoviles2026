@@ -1,8 +1,5 @@
-// Layout de las tabs principales (Home, Registrar, Perfil)
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
-
-// Colores principales de la app
 const COLORS = {
   primary: "#C9362C",
   cream: "#FFF4E8",
@@ -31,7 +28,6 @@ export default function TabsLayout() {
         },
       }}
     >
-      {/* Tab: Inicio / Home */}
       <Tabs.Screen
         name="home"
         options={{
@@ -41,8 +37,15 @@ export default function TabsLayout() {
           ),
         }}
       />
-
-      {/* Tab: Registrar nueva pizza */}
+      <Tabs.Screen
+        name="explorer"
+        options={{
+          title: "Explorar",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="search" size={size} color={color} />
+          ),
+        }}
+      />
       <Tabs.Screen
         name="registrar"
         options={{
@@ -52,8 +55,6 @@ export default function TabsLayout() {
           ),
         }}
       />
-
-      {/* Tab: Perfil del administrador */}
       <Tabs.Screen
         name="perfil"
         options={{

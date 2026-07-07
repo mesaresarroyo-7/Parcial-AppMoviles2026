@@ -40,5 +40,21 @@ yarn-error.*
 /ios
 /android
 
-# Local generated files
+# Dependencies
+node_modules/
+
+# Expo/local generated
+.expo/
 .expo-dev-server.log
+.expo-*.log
+dist/
+web-build/
+
+# Coursework presentation/evidence files kept outside repo
+CAPTURAS*/
+_slide_preview/
+*.docx
+*.pdf
+*.pptx
+*.zip
+*.log

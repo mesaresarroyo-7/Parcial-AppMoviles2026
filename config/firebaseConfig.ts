@@ -1,5 +1,3 @@
-// Configuración de Firebase para Little Caesars
-// IMPORTANTE: Reemplaza los valores con los de tu proyecto en Firebase Console
 import { initializeApp } from "firebase/app";
 import { getDatabase } from "firebase/database";
 import { getAuth } from "firebase/auth";
@@ -13,12 +11,6 @@ const firebaseConfig = {
   messagingSenderId: "579533325081",
   appId: "1:579533325081:web:4a93b77760ec69d6193b88",
 };
-
-// Inicializar Firebase
 const app = initializeApp(firebaseConfig);
-
-// Exportar la referencia a la base de datos Realtime Database
 export const database = getDatabase(app);
-
-// Exportar la referencia a Firebase Authentication
 export const auth = getAuth(app);

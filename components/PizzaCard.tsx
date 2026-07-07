@@ -1,4 +1,3 @@
-// Componente PizzaCard - Tarjeta visual para mostrar cada pizza en el catálogo
 import React from "react";
 import {
   View,
@@ -8,8 +7,6 @@ import {
   StyleSheet,
 } from "react-native";
 import { Pizza } from "../types/pizza";
-
-// Colores principales de la app
 const COLORS = {
   primary: "#C9362C",
   primaryDark: "#A72B23",
@@ -20,8 +17,6 @@ const COLORS = {
   gray: "#777777",
   border: "#E5D8CE",
 };
-
-// Props que recibe el componente
 interface PizzaCardProps {
   pizza: Pizza;
   onPress: () => void;
@@ -30,7 +25,6 @@ interface PizzaCardProps {
 export default function PizzaCard({ pizza, onPress }: PizzaCardProps) {
   return (
     <View style={styles.card}>
-      {/* Imagen de la pizza */}
       <View style={styles.imageContainer}>
         {pizza.imagenUrl ? (
           <Image
@@ -39,14 +33,11 @@ export default function PizzaCard({ pizza, onPress }: PizzaCardProps) {
             resizeMode="cover"
           />
         ) : (
-          // Placeholder si no hay imagen
           <View style={styles.placeholderImage}>
             <Text style={styles.placeholderEmoji}>🍕</Text>
           </View>
         )}
       </View>
-
-      {/* Información de la pizza */}
       <View style={styles.infoContainer}>
         <Text style={styles.nombre} numberOfLines={1}>
           {pizza.nombre}
@@ -71,8 +62,6 @@ export default function PizzaCard({ pizza, onPress }: PizzaCardProps) {
           </View>
           <Text style={styles.precio}>S/ {pizza.precio}</Text>
         </View>
-
-        {/* Botón para ver el detalle */}
         <TouchableOpacity style={styles.button} onPress={onPress}>
           <Text style={styles.buttonText}>Ver detalle</Text>
         </TouchableOpacity>
@@ -89,12 +78,10 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     flexDirection: "row",
     overflow: "hidden",
-    // Sombra para iOS
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
-    // Sombra para Android
     elevation: 4,
     borderWidth: 1,
     borderColor: COLORS.border,

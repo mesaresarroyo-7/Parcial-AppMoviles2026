@@ -1,4 +1,3 @@
-// Pantalla Home - Catálogo de Pizzas (carga en tiempo real desde Firebase)
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -15,8 +14,6 @@ import { ref, onValue } from "firebase/database";
 import { database } from "../../config/firebaseConfig";
 import { Pizza } from "../../types/pizza";
 import PizzaCard from "../../components/PizzaCard";
-
-// Colores principales de la app
 const COLORS = {
   primary: "#C9362C",
   primaryDark: "#A72B23",
@@ -27,28 +24,19 @@ const COLORS = {
   gray: "#777777",
   border: "#E5D8CE",
 };
-
-// Categorías de pizzas para filtro horizontal
 const CATEGORIAS = ["Todas", "Clásicas", "Especiales", "Familiares", "Promociones"];
 
 export default function HomeScreen() {
-  // Estados de la pantalla
   const [pizzas, setPizzas] = useState<Pizza[]>([]);
   const [busqueda, setBusqueda] = useState("");
   const [categoriaActiva, setCategoriaActiva] = useState("Todas");
   const [cargando, setCargando] = useState(true);
   const router = useRouter();
-
-  // useEffect: Cargar pizzas desde Firebase en tiempo real
   useEffect(() => {
-    // Referencia a la colección "pizzas" en Realtime Database
     const pizzasRef = ref(database, "pizzas");
-
-    // Escuchar cambios en tiempo real con onValue
     const unsubscribe = onValue(pizzasRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        // Convertir el objeto JSON de Firebase a un arreglo
         const lista: Pizza[] = Object.keys(data).map((key) => ({
           id: key,
           ...data[key],
@@ -59,12 +47,8 @@ export default function HomeScreen() {
       }
       setCargando(false);
     });
-
-    // Limpiar la suscripción al desmontar el componente
     return () => unsubscribe();
   }, []);
-
-  // Filtrar pizzas por búsqueda y categoría
   const pizzasFiltradas = pizzas.filter((pizza) => {
     const coincideBusqueda =
       pizza.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
@@ -73,21 +57,16 @@ export default function HomeScreen() {
       categoriaActiva === "Todas" || pizza.categoria === categoriaActiva;
     return coincideBusqueda && coincideCategoria;
   });
-
-  // Navegar al detalle de una pizza
   const verDetalle = (id: string) => {
     router.push(`/pizza/${id}`);
   };
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
-      {/* Encabezado rojo */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Bienvenido a Little Caesars 🍕</Text>
         <Text style={styles.headerSubtitle}>¿Qué pizza te provoca hoy?</Text>
       </View>
-
-      {/* Barra de búsqueda */}
       <View style={styles.searchContainer}>
         <Text style={styles.searchIcon}>🔍</Text>
         <TextInput
@@ -98,8 +77,6 @@ export default function HomeScreen() {
           onChangeText={setBusqueda}
         />
       </View>
-
-      {/* Categorías horizontales */}
       <View style={styles.categoriasContainer}>
         <FlatList
           horizontal
@@ -127,16 +104,12 @@ export default function HomeScreen() {
           )}
         />
       </View>
-
-      {/* Contenido principal: Lista de pizzas */}
       {cargando ? (
-        // Indicador de carga
         <View style={styles.centerContent}>
           <ActivityIndicator size="large" color={COLORS.primary} />
           <Text style={styles.loadingText}>Cargando pizzas...</Text>
         </View>
       ) : pizzasFiltradas.length === 0 ? (
-        // Mensaje cuando no hay pizzas
         <View style={styles.centerContent}>
           <Text style={styles.emptyEmoji}>🍕</Text>
           <Text style={styles.emptyText}>
@@ -151,7 +124,6 @@ export default function HomeScreen() {
           </Text>
         </View>
       ) : (
-        // Lista de pizzas usando FlatList
         <FlatList
           data={pizzasFiltradas}
           keyExtractor={(item) => item.id || ""}
@@ -200,7 +172,6 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 4,
-    // Sombra
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,

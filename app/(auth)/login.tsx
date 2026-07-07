@@ -1,4 +1,3 @@
-// Pantalla de Login - Inicio de sesión con Firebase Authentication
 import React, { useState } from "react";
 import {
   View,
@@ -16,8 +15,6 @@ import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../config/firebaseConfig";
-
-// Colores principales de la app
 const COLORS = {
   primary: "#C9362C",
   primaryDark: "#A72B23",
@@ -29,15 +26,11 @@ const COLORS = {
 };
 
 export default function LoginScreen() {
-  // Estado para los campos del formulario
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-
-  // Función para manejar el inicio de sesión con Firebase
   const handleLogin = async () => {
-    // Validación de campos vacíos
     if (!email.trim() || !password.trim()) {
       Alert.alert(
         "Campos vacíos",
@@ -49,13 +42,9 @@ export default function LoginScreen() {
     setLoading(true);
 
     try {
-      // Iniciar sesión con Firebase Authentication
       await signInWithEmailAndPassword(auth, email.trim(), password);
-
-      // Login exitoso: redirigir al Home
       router.replace("/(tabs)/home");
     } catch (error: any) {
-      // Manejo de errores de Firebase con mensajes en español
       let errorMessage = "Ocurrió un error inesperado. Intenta de nuevo.";
 
       switch (error.code) {
@@ -108,16 +97,12 @@ export default function LoginScreen() {
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Logo y título */}
           <View style={styles.logoContainer}>
             <Text style={styles.logoEmoji}>🍅</Text>
             <Text style={styles.title}>Little Caesars</Text>
             <Text style={styles.subtitle}>Inicia sesión para continuar</Text>
           </View>
-
-          {/* Formulario de login */}
           <View style={styles.formCard}>
-            {/* Campo: Correo electrónico */}
             <Text style={styles.label}>Correo electrónico</Text>
             <TextInput
               style={styles.input}
@@ -129,8 +114,6 @@ export default function LoginScreen() {
               autoCapitalize="none"
               autoCorrect={false}
             />
-
-            {/* Campo: Contraseña */}
             <Text style={styles.label}>Contraseña</Text>
             <TextInput
               style={styles.input}
@@ -140,13 +123,9 @@ export default function LoginScreen() {
               onChangeText={setPassword}
               secureTextEntry
             />
-
-            {/* Enlace de olvidaste contraseña */}
             <TouchableOpacity style={styles.forgotContainer}>
               <Text style={styles.forgotText}>¿Olvidaste tu contraseña?</Text>
             </TouchableOpacity>
-
-            {/* Botón de iniciar sesión */}
             <TouchableOpacity
               style={[styles.loginButton, loading && styles.buttonDisabled]}
               onPress={handleLogin}
@@ -159,8 +138,6 @@ export default function LoginScreen() {
               )}
             </TouchableOpacity>
           </View>
-
-          {/* Link para ir al registro */}
           <TouchableOpacity
             style={styles.registerLinkContainer}
             onPress={() => router.push("/(auth)/register")}
@@ -170,8 +147,12 @@ export default function LoginScreen() {
               <Text style={styles.registerLinkBold}>Regístrate</Text>
             </Text>
           </TouchableOpacity>
-
-          {/* Pie de pantalla */}
+          <TouchableOpacity
+            style={styles.skipButton}
+            onPress={() => router.replace("/(tabs)/home")}
+          >
+            <Text style={styles.skipText}>Omitir por ahora →</Text>
+          </TouchableOpacity>
           <Text style={styles.footerText}>
             © 2026 Little Caesars{"\n"}
             Desarrollo de Aplicaciones Móviles 2
@@ -220,12 +201,10 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderRadius: 20,
     padding: 24,
-    // Sombra iOS
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 12,
-    // Sombra Android
     elevation: 6,
     marginBottom: 24,
   },
@@ -261,7 +240,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: "center",
-    // Sombra del botón
     shadowColor: COLORS.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -293,5 +271,15 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.gray,
     lineHeight: 18,
+  },
+  skipButton: {
+    alignItems: "center",
+    marginBottom: 20,
+    paddingVertical: 12,
+  },
+  skipText: {
+    fontSize: 14,
+    color: COLORS.gray,
+    fontWeight: "500",
   },
 });
